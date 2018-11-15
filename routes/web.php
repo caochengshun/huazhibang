@@ -14,3 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('Iot/index','IotController@index');
+
+Route::get('Iot/iot','IotController@iot');
