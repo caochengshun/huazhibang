@@ -2,45 +2,49 @@
 
 namespace App\Http\Controllers;
 
-require_once(base_path().'/app/Libs/Iot/aliyun-php-sdk-core/Config.php');
 use Illuminate\Http\Request;
-use \Iot\Request\V20180120 as Iot;
+use App\Models\IotModel;
+use App\Models\ProductModel;
+use App\Services\ProductService;
 class IotController extends Controller
 {
 
-	private $accessKeyId;
-	private $accessSecret;
-	private $client;
+    private $IotModel;
 
-	function __construct(){
-		$this->accessKeyId = env('ACCESSKEYID');
-		$this->accessSecret = env('ACCESSKEYSECRET');
-		$iClientProfile = \DefaultProfile::getProfile("cn-shanghai", $this->accessKeyId, $this->accessSecret);
-		$this->client = new \DefaultAcsClient($iClientProfile);
-	}
+    function __construct(){
+        $this->IotModel = new IotModel();
+        $this->ProductModel = new ProductModel();
+    }
 
     public function index(){
-    	echo 'aaa';
+        echo 'aaa';
     }
 
     public function iot(){
 
-    	$pageSize = '50';
-    	$currentPage = '1';
-		$this->queryDeviceByNameTest($pageSize,$currentPage);
+        $pageSize = '50';
+        $currentPage = '1';
+        $this->IotModel->queryProductList($pageSize,$currentPage);
+        echo time();
+        echo "<br/>";
+        echo $aa = '1542165362000.0';
+        echo date('Y-m-d',$aa/1000);
     }
 
-    /**
-     * 根据devicename查询所有产品列表。
-     * @param $pageSize
-     * @param $currentPage
-     */
-    public function queryDeviceByNameTest($pageSize,$currentPage)
-    {
-        $request = new Iot\QueryProductListRequest();
-        $request->setPageSize($pageSize);
-        $request->setCurrentPage($currentPage);
-        $response = $this->client->getAcsResponse($request);
-        print_r($response);
+    public function productlist(){
+
+        $pageSize = '50';
+        $currentPage = '1';
+        $result = $this->IotModel->queryProductList($pageSize,$currentPage);
+        if($result['Success']){
+            if(empty($result['Data']['List']['ProductInfo'])){
+                echo '暂无产品';
+            }else{
+                app(ProductService::class)->productCreateOrUpdate($result['Data']['List']['ProductInfo']);
+            }
+        }else{
+            echo '失败';
+        }
     }
+
 }

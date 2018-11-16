@@ -18,3 +18,4 @@ Route::get('/', function () {
 Route::get('Iot/index','IotController@index');
 
 Route::get('Iot/iot','IotController@iot');
+Route::get('Iot/list','IotController@productlist');
